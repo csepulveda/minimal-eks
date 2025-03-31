@@ -60,10 +60,10 @@ locals {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.24.0"
+  version = "20.35.0"
 
   cluster_name    = local.name
-  cluster_version = "1.30"
+  cluster_version = "1.32"
 
   # Gives Terraform identity admin access to cluster which will
   # allow deploying resources (Karpenter) into the cluster
@@ -123,7 +123,7 @@ module "eks" {
 
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "20.24.0"
+  version = "20.35.0"
 
   cluster_name = module.eks.cluster_name
 
@@ -245,7 +245,7 @@ resource "kubectl_manifest" "karpenter_node_pool" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "5.19.0"
 
   name = local.name
   cidr = local.vpc_cidr

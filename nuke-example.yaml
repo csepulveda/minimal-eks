@@ -1,0 +1,16 @@
+regions:
+- "global"
+- "us-east-1"
+
+blocklist:
+- "0000000000"
+
+accounts:
+  27xxxxxxxxx:
+    filters:
+      IAMUser:
+      - "user"
+      IAMUserPolicyAttachment:
+      - "user -> AdministratorAccess"
+      IAMUserAccessKey:
+      - "user -> xxxxxxxxxx"

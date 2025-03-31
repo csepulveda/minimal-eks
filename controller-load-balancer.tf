@@ -3,7 +3,7 @@ resource "helm_release" "aws-load-balancer-controller" {
   chart      = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
   namespace  = "kube-system"
-  version    = "1.8.3"
+  version    = "1.12.0"
 
   set {
     name  = "serviceAccount.create"
@@ -37,7 +37,7 @@ resource "helm_release" "aws-load-balancer-controller" {
 
 module "eks_loadbalancer_iam" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.44.0"
+  version = "5.54.0"
 
   role_name                              = "load-balancer-controller"
   attach_load_balancer_controller_policy = true

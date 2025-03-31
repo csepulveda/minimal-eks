@@ -3,7 +3,7 @@ resource "helm_release" "external_dns" {
   name       = "external-dns"
   chart      = "external-dns"
   repository = "https://kubernetes-sigs.github.io/external-dns/"
-  version    = "1.15.0"
+  version    = "1.16.0"
   namespace  = "kube-system"
 
   set {
@@ -14,7 +14,7 @@ resource "helm_release" "external_dns" {
 
 module "eks_external_dns_iam" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.44.0"
+  version = "5.54.0"
 
   role_name                     = "external-dns"
   attach_external_dns_policy    = true

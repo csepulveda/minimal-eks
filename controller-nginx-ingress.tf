@@ -3,7 +3,7 @@ resource "helm_release" "ingress-nginx" {
   chart      = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   namespace  = "kube-system"
-  version    = "4.11.2"
+  version    = "4.12.1"
 
   set {
     name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-name"

@@ -3,7 +3,7 @@ resource "helm_release" "metrics-server" {
   chart      = "metrics-server"
   repository = "https://kubernetes-sigs.github.io/metrics-server/"
   namespace  = "kube-system"
-  version    = "3.12.1"
+  version    = "3.12.2"
 
   depends_on = [
     helm_release.karpenter
