@@ -85,6 +85,8 @@ module "eks" {
   subnet_ids               = module.vpc.private_subnets
   control_plane_subnet_ids = module.vpc.intra_subnets
 
+
+  ## we need a small group of managed node groups to run Karpenter and install all initial helm charts
   eks_managed_node_groups = {
     eks-base = {
       ami_type       = "AL2023_x86_64_STANDARD"
@@ -153,7 +155,7 @@ resource "helm_release" "karpenter" {
   # repository_username = data.aws_ecrpublic_authorization_token.token.user_name
   # repository_password = data.aws_ecrpublic_authorization_token.token.password
   chart   = "karpenter"
-  version = "1.0.0"
+  version = "1.3.2"
   wait    = true
 
   values = [
@@ -171,12 +173,14 @@ resource "helm_release" "karpenter" {
 
 resource "kubectl_manifest" "karpenter_node_class" {
   yaml_body = <<-YAML
-    apiVersion: karpenter.k8s.aws/v1beta1
+    apiVersion: karpenter.k8s.aws/v1
     kind: EC2NodeClass
     metadata:
       name: default
     spec:
       amiFamily: AL2023
+      amiSelectorTerms:
+      - alias: al2023@latest
       role: ${module.karpenter.node_iam_role_name}
       subnetSelectorTerms:
         - tags:
@@ -195,14 +199,21 @@ resource "kubectl_manifest" "karpenter_node_class" {
 
 resource "kubectl_manifest" "karpenter_node_pool" {
   yaml_body = <<-YAML
-    apiVersion: karpenter.sh/v1beta1
+    apiVersion: karpenter.sh/v1
     kind: NodePool
     metadata:
       name: default
     spec:
+      limits:
+        cpu: 1000
+      disruption:
+        consolidationPolicy: WhenEmptyOrUnderutilized
+        consolidateAfter: 15m
       template:
         spec:
           nodeClassRef:
+            group: karpenter.k8s.aws
+            kind: EC2NodeClass
             name: default
           requirements:
             - key: karpenter.sh/capacity-type
@@ -226,11 +237,6 @@ resource "kubectl_manifest" "karpenter_node_pool" {
             - key: karpenter.k8s.aws/instance-memory
               operator: Gt
               values: ["1800"]
-      limits:
-        cpu: 1000
-      disruption:
-        consolidationPolicy: WhenEmpty
-        consolidateAfter: 30s
   YAML
 
   depends_on = [
